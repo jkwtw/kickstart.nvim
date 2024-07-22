@@ -104,7 +104,9 @@ vim.opt.number = true
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
 
-vim.o.statuscolumn = '%s %l %r %C'
+-- vim.o.statuscolumn = '%s %l %r %C'
+
+vim.o.statuscolumn = '%s %3l %r %C'
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -313,12 +315,14 @@ require('lazy').setup({
       require('which-key').setup()
 
       -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+      require('which-key').add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       }
     end,
   },
@@ -386,6 +390,22 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {}
+        --
+        defaults = {
+          vimgrep_arguments = {
+            'rg',
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+            '--ignore-file',
+            '.gitignore',
+            '--hidden',
+          },
+        },
+
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -571,8 +591,19 @@ require('lazy').setup({
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+
+      local function setup_clangd_keymaps(bufnr)
+        local opts = { noremap = true, silent = true }
+        vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>gh', '<cmd>ClangdSwitchSourceHeader<CR>', opts)
+      end
+
       local servers = {
-        clangd = { cmd = { 'clangd', '--clang-tidy', '--background-index', '--cross-file-rename' } },
+        clangd = {
+          cmd = { 'clangd', '--clang-tidy', '--background-index' },
+          on_attach = function(client, bufnr)
+            setup_clangd_keymaps(bufnr)
+          end,
+        },
         -- ccls = {},
         -- gopls = {},
         -- pyright = {},
@@ -703,6 +734,7 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      -- 'hrsh7th/cmp-buffer',
     },
     config = function()
       -- See `:help cmp`
@@ -773,6 +805,7 @@ require('lazy').setup({
         },
         sources = {
           { name = 'nvim_lsp' },
+          -- { name = 'cody' },
           { name = 'luasnip' },
           { name = 'path' },
         },
@@ -828,6 +861,7 @@ require('lazy').setup({
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
+      -- delete default s keybind
       require('mini.surround').setup()
 
       -- Simple and easy statusline.
@@ -1009,6 +1043,44 @@ require('lazy').setup({
       vim.keymap.set('i', '<S-TAB>', '<Plug>(doge-comment-jump-backward)')
       vim.keymap.set('x', '<TAB>', '<Plug>(doge-comment-jump-forward)')
       vim.keymap.set('x', '<S-TAB>', '<Plug>(doge-comment-jump-backward)')
+    end,
+  },
+  -- {
+  --   'sourcegraph/sg.nvim',
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'nvim-telescope/telescope.nvim',
+  --   },
+  --   config = function()
+  --     require('sg').setup {
+  --       accept_tos = true,
+  --       chat = {
+  --         default_model = 'opeanai/gpt-4o',
+  --       },
+  --     }
+  --   end,
+  -- },
+  {
+    'supermaven-inc/supermaven-nvim',
+    config = function()
+      require('supermaven-nvim').setup {
+        keymaps = {
+          accept_suggestion = '<C-y>',
+          clear_suggestion = '<C-]>',
+          accept_word = '<C-j>',
+        },
+      }
+    end,
+  },
+  {
+    'lukas-reineke/indent-blankline.nvim',
+    config = function()
+      require('ibl').setup {
+        indent = {
+          -- dotted lines
+          char = '┆',
+        },
+      }
     end,
   },
 
