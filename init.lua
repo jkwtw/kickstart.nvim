@@ -180,6 +180,13 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagn
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- quickfix prev cnext [q ]q
+vim.keymap.set('n', '[q', ':cprev<CR>', { desc = 'Go to previous [Q]uickfix message', noremap = true, silent = true })
+vim.keymap.set('n', ']q', ':cnext<CR>', { desc = 'Go to next [Q]uickfix message', noremap = true, silent = true })
+-- cc, co
+vim.keymap.set('n', '<leader>cc', ':cclose<CR>', { desc = 'Close [C]urrent quickfix list', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>co', ':copen<CR>', { desc = 'Open [C]urrent quickfix list', noremap = true, silent = true })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -1035,6 +1042,8 @@ require('lazy').setup({
     config = function()
       -- Generate comment for current line
       vim.keymap.set('n', '<Leader>dg', '<Plug>(doge-generate)')
+      -- set doc standard for c
+      vim.g.doge_doc_standard_c = 'doxygen_qt'
 
       -- Interactive mode comment todo-jumping
       vim.keymap.set('n', '<TAB>', '<Plug>(doge-comment-jump-forward)')
