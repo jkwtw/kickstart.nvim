@@ -177,6 +177,12 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
+vim.keymap.set('n', '[e', function()
+  vim.diagnostic.goto_prev { severity = vim.diagnostic.severity.ERROR }
+end, { desc = 'Go to previous [E]rror message' })
+vim.keymap.set('n', ']e', function()
+  vim.diagnostic.goto_next { severity = vim.diagnostic.severity.ERROR }
+end, { desc = 'Go to next [E]rror message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -254,6 +260,39 @@ if not vim.loop.fs_stat(lazypath) then
   vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
+
+vim.filetype.add {
+  extension = {
+    sym = 'ini', -- Treat .sym files as INI
+  },
+}
+
+-- Function to change to a fixed directory, run make, and return to the original directory
+local function make_custom()
+  -- Save the current directory
+  local original_dir = vim.fn.getcwd()
+
+  -- Change to the specified directory
+  vim.cmd 'lcd ./HardwareDebug'
+
+  -- Set makeprg to a simple make command (no -C needed)
+  vim.opt.makeprg = 'make -j'
+
+  -- Run make and populate the quickfix list
+  vim.cmd 'make clean'
+  vim.cmd 'make all'
+
+  -- Restore the original directory
+  vim.cmd('lcd ' .. original_dir)
+
+  -- Open the quickfix window
+  -- vim.cmd 'copen'
+end
+
+-- Create a custom command to use the function
+vim.api.nvim_create_user_command('MakeCustom', function()
+  make_custom()
+end, {})
 
 -- [[ Configure and install plugins ]]
 --
@@ -840,11 +879,16 @@ require('lazy').setup({
         -- use the night style
         style = 'night',
         -- Change the "hint" color to the "orange" color, and make the "error" color bright red
-        ---@param colors Colorscheme
-        on_colors = function(colors)
-          -- colors.fg_gutter = '#bdc2e3'
-          -- colors.fg_sidebar = '#bdc2e3'
-        end,
+        --- You can override specific color groups to use other groups or a hex color
+        --- function will be called with a ColorScheme table
+        ---@param colors ColorScheme
+        on_colors = function(colors) end,
+
+        --- You can override specific highlights to use other groups or a hex color
+        --- function will be called with a Highlights and ColorScheme table
+        ---@param highlights tokyonight.Highlights
+        ---@param colors ColorScheme
+        on_highlights = function(highlights, colors) end,
       }
     end,
   },
@@ -895,7 +939,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'doxygen', 'cmake' },
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'doxygen', 'cmake', 'ini' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
