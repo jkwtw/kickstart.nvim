@@ -238,27 +238,29 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
-vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-  callback = function(event)
-    local title = 'vim'
-    if event.file ~= '' then
-      title = string.format('vim: %s', vim.fs.basename(event.file))
-    end
+if vim.loop.os_uname().sysname == 'Windows_NT' then
+  vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+    callback = function(event)
+      local title = 'vim'
+      if event.file ~= '' then
+        title = string.format('vim: %s', vim.fs.basename(event.file))
+      end
 
-    vim.fn.system { 'wezterm', 'cli', 'set-tab-title', title }
-  end,
-})
+      vim.fn.system { 'wezterm', 'cli', 'set-tab-title', title }
+    end,
+  })
 
-vim.api.nvim_create_autocmd({ 'ExitPre' }, {
-  callback = function(event)
-    local title = 'pwsh.exe'
-    --[[ if event.file ~= '' then
-      title = string.format('vim: %s', vim.fs.basename(event.file))
-    end ]]
+  vim.api.nvim_create_autocmd({ 'ExitPre' }, {
+    callback = function(event)
+      local title = 'pwsh.exe'
+      --[[ if event.file ~= '' then
+        title = string.format('vim: %s', vim.fs.basename(event.file))
+      end ]]
 
-    vim.fn.system { 'wezterm', 'cli', 'set-tab-title', title }
-  end,
-})
+      vim.fn.system { 'wezterm', 'cli', 'set-tab-title', title }
+    end,
+  })
+end
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
