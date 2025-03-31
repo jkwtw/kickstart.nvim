@@ -896,6 +896,7 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         rust = { 'rustfmt' },
+        C = { 'clang-format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -1057,29 +1058,14 @@ require('lazy').setup({
         styles = {
           comments = { italic = false }, -- Disable italics in comments
         },
+
+        style = 'night',
       }
 
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       vim.cmd.colorscheme 'tokyonight-night'
-    end,
-    config = function()
-      require('tokyonight').setup {
-        -- use the night style
-        style = 'night',
-        -- Change the "hint" color to the "orange" color, and make the "error" color bright red
-        --- You can override specific color groups to use other groups or a hex color
-        --- function will be called with a ColorScheme table
-        ---@param colors ColorScheme
-        on_colors = function(colors) end,
-
-        --- You can override specific highlights to use other groups or a hex color
-        --- function will be called with a Highlights and ColorScheme table
-        ---@param highlights tokyonight.Highlights
-        ---@param colors ColorScheme
-        on_highlights = function(highlights, colors) end,
-      }
     end,
   },
 
@@ -1164,6 +1150,7 @@ require('lazy').setup({
           lua = { 'string' }, -- it will not add a pair on that treesitter node
           javascript = { 'template_string' },
           java = false, -- don't check treesitter on java
+          C = { 'string' },
         },
       }
 
@@ -1174,69 +1161,6 @@ require('lazy').setup({
         Rule('%', '%', 'lua'):with_pair(ts_conds.is_ts_node { 'string', 'comment' }),
         Rule('$', '$', 'lua'):with_pair(ts_conds.is_not_ts_node { 'function' }),
       }
-    end,
-  },
-  {
-    'theprimeagen/harpoon',
-    branch = 'harpoon2',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    config = function()
-      local harpoon = require 'harpoon'
-
-      -- REQUIRED
-      harpoon:setup()
-      -- REQUIRED
-
-      -- basic telescope configuration
-      local conf = require('telescope.config').values
-      local function toggle_telescope(harpoon_files)
-        local file_paths = {}
-        for _, item in ipairs(harpoon_files.items) do
-          table.insert(file_paths, item.value)
-        end
-
-        require('telescope.pickers')
-          .new({}, {
-            prompt_title = 'Harpoon',
-            finder = require('telescope.finders').new_table {
-              results = file_paths,
-            },
-            previewer = conf.file_previewer {},
-            sorter = conf.generic_sorter {},
-          })
-          :find()
-      end
-      vim.keymap.set('n', '<C-e>', function()
-        toggle_telescope(harpoon:list())
-      end, { desc = 'Open harpoon window' })
-
-      vim.keymap.set('n', '<leader>A', function()
-        harpoon:list():add()
-      end, { desc = 'Harpoon add' })
-      vim.keymap.set('n', '<leader>a', function()
-        harpoon.ui:toggle_quick_menu(harpoon:list())
-      end, { desc = 'Harpoon list' })
-
-      vim.keymap.set('n', '<leader>1', function()
-        harpoon:list():select(1)
-      end, { desc = 'Harpoon file 1' })
-      vim.keymap.set('n', '<leader>2', function()
-        harpoon:list():select(2)
-      end, { desc = 'Harpoon file 2' })
-      vim.keymap.set('n', '<leader>3', function()
-        harpoon:list():select(3)
-      end, { desc = 'Harpoon file 3' })
-      vim.keymap.set('n', '<leader>4', function()
-        harpoon:list():select(4)
-      end, { desc = 'Harpoon file 4' })
-
-      -- Toggle previous & next buffers stored within Harpoon list
-      vim.keymap.set('n', '<C-S-P>', function()
-        harpoon:list():prev()
-      end)
-      vim.keymap.set('n', '<C-S-N>', function()
-        harpoon:list():next()
-      end)
     end,
   },
   {
@@ -1289,21 +1213,6 @@ require('lazy').setup({
       vim.keymap.set('x', '<S-TAB>', '<Plug>(doge-comment-jump-backward)')
     end,
   },
-  -- {
-  --   'sourcegraph/sg.nvim',
-  --   dependencies = {
-  --     'nvim-lua/plenary.nvim',
-  --     'nvim-telescope/telescope.nvim',
-  --   },
-  --   config = function()
-  --     require('sg').setup {
-  --       accept_tos = true,
-  --       chat = {
-  --         default_model = 'opeanai/gpt-4o',
-  --       },
-  --     }
-  --   end,
-  -- },
   {
     'supermaven-inc/supermaven-nvim',
     config = function()
@@ -1363,7 +1272,7 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  require 'kickstart.plugins.debug',
+  -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
