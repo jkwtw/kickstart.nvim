@@ -171,7 +171,11 @@ vim.opt.confirm = true
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 
-vim.opt.shell = 'cmd'
+if vim.loop.os_uname().sysname == 'Windows_NT' then
+  vim.opt.shell = 'cmd'
+else -- Linux
+  vim.opt.shell = '/bin/fish'
+end
 -- vim.opt.shellcmdflag =
 --   " -NoLogo -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();$PSDefaultParameterValues['Out-File:Encoding']='utf8';Remove-Alias -Force -ErrorAction SilentlyContinue tee;"
 -- vim.opt.shellredir = [[2>&1 | %{ "$_" } | Out-File %s; exit $LastExitCode]]
@@ -1262,6 +1266,7 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
+  { 'Civitasv/cmake-tools.nvim', opts = {} },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
