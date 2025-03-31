@@ -883,7 +883,8 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
-      -- 'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-cmdline', -- Cmdline completion
+      'hrsh7th/cmp-buffer',
     },
     config = function()
       -- See `:help cmp`
@@ -959,11 +960,28 @@ require('lazy').setup({
             group_index = 0,
           },
           { name = 'nvim_lsp' },
-          -- { name = 'cody' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'buffer' }, -- Enable buffer completion
         },
       }
+      -- Command-line setup
+      cmp.setup.cmdline(':', {
+        -- Use cmdline preset mappings
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources {
+          { name = 'path' }, -- Path completion
+          { name = 'cmdline' }, -- Command-line completion
+        },
+      })
+
+      cmp.setup.cmdline({ '/', '?' }, {
+        -- Use cmdline preset mappings for search
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = 'buffer' }, -- Search within buffer
+        },
+      })
     end,
   },
 
@@ -1281,7 +1299,7 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
