@@ -136,6 +136,105 @@ return {
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
 
+    dap.adapters.renesas = {
+      type = 'executable',
+      command = 'C:/Users/jkoenig.WTW/AppData/Roaming/Code/User/globalStorage/renesaselectronicscorporation.renesas-debug/DebugComp/RX/e2-server-gdb.exe', -- Adjust this to your debugger's path
+      -- command = 'rx-elf-gdb',
+      name = 'Renesas GDB Hardware',
+      args = {
+        -- Add the arguments for your debugger, including the server parameters
+        '-g',
+        'E2LITE',
+        '-t',
+        'R5F5651E_DUAL',
+        '-uConnectionTimeout=',
+        '30',
+        '-uClockSrcHoco=',
+        '0',
+        '-uInputClock=',
+        '27.0',
+        '-uPTimerClock=',
+        '12000000',
+        '-uAllowClockSourceInternal=',
+        '1',
+        '-uUseFine=',
+        '1',
+        '-uFineBaudRate=',
+        '1.50',
+        '-sn=',
+        'e2l:_9js014066a',
+        '-w',
+        '0',
+        '-z',
+        '0',
+        '-uRegisterSetting=',
+        '0',
+        '-uModePin=',
+        '0',
+        '-uChangeStartupBank=',
+        '1',
+        '-uStartupBank=',
+        '0',
+        '-uDebugMode=',
+        '0',
+        '-uExecuteProgram=',
+        '0',
+        '-uIdCode=',
+        'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+        '-uresetOnReload=',
+        '1',
+        '-n',
+        '0',
+        '-uWorkRamAddress=',
+        '1000',
+        '-uverifyOnWritingMemory=',
+        '0',
+        '-uProgReWriteIRom=',
+        '0',
+        '-uProgReWriteDFlash=',
+        '0',
+        '-uhookWorkRamAddr=',
+        '0x3fdd0',
+        '-uhookWorkRamSize=',
+        '0x230',
+        '-uOSRestriction=',
+        '0',
+        '-l',
+        '-uCore=',
+        'SINGLE_CORE|enabled|1|main',
+        '-uSyncMode=',
+        'async',
+        '-uFirstGDB=',
+        'main',
+        '--english',
+        '--gdbVersion=',
+        '12.1',
+      },
+    }
+    dap.configurations.c = {
+      {
+        name = 'Renesas GDB Hardware Debugging E2LITE',
+        type = 'renesas', -- Type must match the adapter we defined
+        request = 'launch',
+        program = function()
+          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = '${workspaceFolder}',
+        stopAtEntry = false, -- You can adjust this depending on your needs
+        args = {},
+        setupCommands = {
+          {
+            text = '-enable-pretty-printing',
+            description = 'Enable pretty printing',
+            ignoreFailures = false,
+          },
+        },
+        runInTerminal = true,
+      },
+    }
+
+    dap.configurations.cpp = dap.configurations.c
+
     -- Install golang specific config
     require('dap-go').setup {
       delve = {
