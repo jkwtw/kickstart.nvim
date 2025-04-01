@@ -105,8 +105,8 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 
 -- vim.o.statuscolumn = '%s %l %r %C'
-
-vim.o.statuscolumn = '%s %3l %r %C'
+-- vim.o.statuscolumn = '%s %3l %r %C'
+vim.o.statuscolumn = '%s %3{v:lnum} %{v:relnum} %C'
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
